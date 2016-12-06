@@ -34,7 +34,7 @@ void do_output(const std::wstring &s) {
         int sz = WideCharToMultiByte(CP_UTF8, 0, s.c_str(), s.size(), &utf8sz[0], utf8sz.size(), 0, NULL);
         utf8sz.resize(sz);
         for(unsigned char ch: utf8sz) {
-            if(ch>126) {
+            if(ch>126 || ch<=32 || ch=='"' || ch=='\'') {
                 printf("%%%02x", unsigned(ch));
             } else {
                 putchar(ch);
@@ -224,7 +224,7 @@ int my_wmain(int argc, wchar_t *argv[]) {
     // Output with the given delimiter
     bool first = true;
     for(auto &out: output) {
-        if(!first) do_output(separator);
+        if(!first) fputws(separator.c_str(), stdout);
         first = false;
         do_output(out);
     }
