@@ -1,0 +1,3 @@
+#!/bin/sh
+dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+cmake "$dir" -DCMAKE_TOOLCHAIN_FILE="$dir/toolchain-mingw32-dw2-w32threads.cmake" -DCMAKE_BUILD_TYPE=RelWithDebInfo
