@@ -134,6 +134,8 @@ int my_wmain(int argc, wchar_t *argv[]) {
             directory = true;
         } else if(a==L"--save") {
             save = true;
+        } else if(a==L"--initial-directory" && next()) {
+            initial_directory = a;
         } else if(a==L"--confirm-overwrite") {
             confirm_overwrite = true;
         } else if(a==L"--utf8out") {
