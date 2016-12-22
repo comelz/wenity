@@ -173,7 +173,6 @@ int my_wmain(int argc, wchar_t *argv[]) {
         OPENFILENAMEW OPF;
         ZeroMemory(&OPF, sizeof(OPF));
         OPF.lStructSize = sizeof(OPENFILENAME);
-        OPF.hwndOwner = 0;
         OPF.lpstrFilter = filter_str.c_str();
         OPF.nFilterIndex = 1;
         filename.resize(32768);
@@ -183,6 +182,20 @@ int my_wmain(int argc, wchar_t *argv[]) {
         OPF.lpstrTitle = title.c_str();
         OPF.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_ENABLESIZING | OFN_PATHMUSTEXIST;
         if(multiple) OPF.Flags |= OFN_ALLOWMULTISELECT;
+        DWORD err = 0;
+        OPF.hwndOwner = 0;
+        do {
+            // Try to position it decently
+            // Get the geometry of the foreground window
+            HWND fgw = GetForegroundWindow();
+            if(!fgw) break;
+            RECT r = {0,0,0,0};
+            if(!GetWindowRect(fgw, &r)) break;
+            // Make a hidden parent with the same geometry of the foreground window,
+            // so the dialog will be centered relative to it
+            OPF.hwndOwner = CreateWindowW(L"STATIC", L"", 0, r.left, r.top, r.right-r.left, r.bottom-r.top,
+                    0,0,0,0);
+        } while(false);
         if(save) {
             if(confirm_overwrite)  OPF.Flags |= OFN_OVERWRITEPROMPT;
             if(!GetSaveFileNameW(&OPF)) {
@@ -201,6 +214,10 @@ int my_wmain(int argc, wchar_t *argv[]) {
                     return 2;
                 }
             }
+        }
+        // Destroy the dummy parent (if any)
+        if(OPF.hwndOwner) {
+            DestroyWindow(OPF.hwndOwner);
         }
         // Decode
         for(const wchar_t *ptr=filename.c_str();;)
