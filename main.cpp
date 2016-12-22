@@ -186,14 +186,20 @@ int my_wmain(int argc, wchar_t *argv[]) {
         if(save) {
             if(confirm_overwrite)  OPF.Flags |= OFN_OVERWRITEPROMPT;
             if(!GetSaveFileNameW(&OPF)) {
-                fprintf(stderr, "GetSaveFileName failed with error code %u\n", CommDlgExtendedError());
-                return 2;
+                err = CommDlgExtendedError();
+                if(err != 0) {
+                    fprintf(stderr, "GetSaveFileName failed with error code %u\n", unsigned(err));
+                    return 2;
+                }
             }
         } else {
             OPF.Flags |= OFN_FILEMUSTEXIST;
             if(!GetOpenFileNameW(&OPF)) {
-                fprintf(stderr, "GetOpenFileName failed with error code %u\n", CommDlgExtendedError());
-                return 2;
+                err = CommDlgExtendedError();
+                if(err != 0) {
+                    fprintf(stderr, "GetOpenFileName failed with error code %u\n", unsigned(err));
+                    return 2;
+                }
             }
         }
         // Decode
