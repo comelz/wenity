@@ -20,6 +20,7 @@ std::wstring separator = L"|";
 bool confirm_overwrite;
 std::vector<std::wstring> file_filter;
 bool multiple;
+bool add_terminator;
 
 int hexdec(wchar_t ch) {
     if(L'0'<=ch && ch<=L'9') return ch-L'0';
@@ -140,6 +141,8 @@ int my_wmain(int argc, wchar_t *argv[]) {
             confirm_overwrite = true;
         } else if(a==L"--utf8out") {
             utf8out = true;
+        } else if(a==L"--add-terminator") {
+            add_terminator = true;
         } else {
             fwprintf(stderr, L"Unrecognized option: `%ls`\n", a.c_str());
         }
@@ -250,6 +253,12 @@ int my_wmain(int argc, wchar_t *argv[]) {
         if(!first) fputws(separator.c_str(), stdout);
         first = false;
         do_output(out);
+    }
+    // If requested, add an extra terminator, thus giving out an empty entry as
+    // sentinel (wenity sometimes takes a long time to exit due to the shell stuff
+    // deinitialization, this allows clients to go on with their work quickly)
+    if(add_terminator) {
+        fputws(separator.c_str(), stdout);
     }
     // Be nice and always add a newline
     putchar('\n');
