@@ -52,7 +52,10 @@ int main() {
     wchar_t *args = GetCommandLineW();
     int argc = 0;
     wchar_t **argv = CommandLineToArgvW(args, &argc);
-    return my_wmain(argc, argv);
+    int ret = my_wmain(argc, argv);
+    // force flush and allow pipes to detect that nothing else will come next
+    fclose(stdout);
+    return ret;
 }
 
 int my_wmain(int argc, wchar_t *argv[]) {
